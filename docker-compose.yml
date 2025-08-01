@@ -1,0 +1,24 @@
+version: "3"
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3080:3080"
+    volumes:
+      - ./backend:/app
+    environment:
+      - MONGO_URL=mongodb://db:27017/tareas
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3001:3000"
+    stdin_open: true
+    tty: true
+
+  db:
+    image: mongo
+    ports:
+      - "27017:27017"
