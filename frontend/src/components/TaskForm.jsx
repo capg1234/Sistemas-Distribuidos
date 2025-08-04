@@ -1,23 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 
 const estados = ['pendiente', 'en progreso', 'completada'];
 
-
-const TaskForm = ({ onSubmit, tareaSeleccionada, limpiarSeleccion }) => {
+const TaskForm = forwardRef(({ onSubmit, tareaSeleccionada, limpiarSeleccion }, ref) => {
   const [form, setForm] = useState({
     titulo: '',
     descripcion: '',
     estado: 'pendiente',
-    fechaLimite: ''
+    fechaLimite: '',
+    responsable: ''
   });
 
-  const [inicioAsignacion, setInicioAsignacion] = useState(null); // nuevo estado
+  const [inicioAsignacion, setInicioAsignacion] = useState(null); 
 
   useEffect(() => {
-    setInicioAsignacion(new Date()); // registrar el inicio al cargar o editar
+    setInicioAsignacion(new Date()); 
 
     if (tareaSeleccionada) {
-      setForm(tareaSeleccionada);
+      setForm({
+        ...tareaSeleccionada,
+        responsable: tareaSeleccionada.responsable || '' 
+      });
     }
   }, [tareaSeleccionada]);
 
@@ -27,9 +30,9 @@ const TaskForm = ({ onSubmit, tareaSeleccionada, limpiarSeleccion }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const finAsignacion = new Date(); // captura del momento del envío
+    const finAsignacion = new Date(); 
 
-    const tiempoAsignacion = Math.floor((finAsignacion - inicioAsignacion) / 1000); // en segundos 
+    const tiempoAsignacion = Math.floor((finAsignacion - inicioAsignacion) / 1000); 
 
     const formConTiempo = {
       ...form,
@@ -38,21 +41,22 @@ const TaskForm = ({ onSubmit, tareaSeleccionada, limpiarSeleccion }) => {
       tiempoAsignacion
     };
 
-    onSubmit(formConTiempo); // enviar datos con los tiempos registrados
+    onSubmit(formConTiempo); 
 
-    // limpiar formulario
     setForm({
       titulo: '',
       descripcion: '',
       estado: 'pendiente',
-      fechaLimite: ''
+      fechaLimite: '',
+      responsable: ''
     });
     limpiarSeleccion();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} ref={ref}> {/* <-- Cambio 1: Referencia del formulario */}
       <h3>{tareaSeleccionada ? 'Editar Tarea' : 'Nueva Tarea'}</h3>
+
       <input
         type="text"
         name="titulo"
@@ -62,6 +66,7 @@ const TaskForm = ({ onSubmit, tareaSeleccionada, limpiarSeleccion }) => {
         required
       />
       <br />
+
       <textarea
         name="descripcion"
         placeholder="Descripción"
@@ -69,22 +74,36 @@ const TaskForm = ({ onSubmit, tareaSeleccionada, limpiarSeleccion }) => {
         onChange={handleChange}
       />
       <br />
+
       <select name="estado" value={form.estado} onChange={handleChange}>
         {estados.map((estado) => (
           <option key={estado} value={estado}>{estado}</option>
         ))}
       </select>
       <br />
+
       <input
         type="date"
         name="fechaLimite"
         value={form.fechaLimite?.slice(0, 10)}
         onChange={handleChange}
+        /*onClick={(e) => e.target.showPicker()}
+        onFocus={(e) => e.target.showPicker()}*/
       />
       <br />
+
+      <input
+        type="text"
+        name="responsable"
+        placeholder="Responsable"
+        value={form.responsable}
+        onChange={handleChange}
+      />
+      <br />
+
       <button type="submit">{tareaSeleccionada ? 'Actualizar' : 'Crear'}</button>
     </form>
   );
-};
+});
 
 export default TaskForm;

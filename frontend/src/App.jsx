@@ -1,22 +1,17 @@
 import React from 'react';
+import './styles.css';
 import TaskList from './components/TaskList';
 
 const App = () => {
   return (
-    <div style={styles.container}>
-      <h1>🗂️ Sistema de Gestión de Tareas Distribuido</h1>
+    <div className="container">
+      <header className="header">
+        <img src="/logo2.png" alt="Logo de TareaSync" className="logo" />
+        {/*<h1 className="logo-text">🗂️ Sistema de Gestión de Tareas Distribuido</h1>*/}
+      </header>
       <TaskList />
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '600px',
-    margin: '0 auto',
-    padding: '20px',
-    fontFamily: 'Arial, sans-serif',
-  },
 };
 
 export default App;

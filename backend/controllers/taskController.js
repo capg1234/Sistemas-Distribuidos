@@ -13,17 +13,26 @@ exports.obtenerTareas = async (req, res) => {
 // Crear nueva tarea
 exports.crearTarea = async (req, res) => {
   try {
-    //const nuevaTarea = new Task(req.body);
-    const { titulo, descripcion, estado, fechaLimite, inicioAsignacion, finAsignacion, tiempoAsignacion } = req.body;
+    const {
+      titulo,
+      descripcion,
+      estado,
+      fechaLimite,
+      responsable,
+      fechaAsignacion,      // <- nuevo
+      tiempoAsignacion      // <- nuevo
+    } = req.body;
+
     const nuevaTarea = new Task({
       titulo,
       descripcion,
       estado,
       fechaLimite,
-      inicioAsignacion,
-      finAsignacion,
+      responsable,
+      fechaAsignacion,
       tiempoAsignacion
     });
+
     await nuevaTarea.save();
     res.status(201).json(nuevaTarea);
   } catch (err) {
@@ -33,28 +42,29 @@ exports.crearTarea = async (req, res) => {
 
 // Actualizar tarea
 exports.actualizarTarea = async (req, res) => {
+  console.log('Datos recibidos en la solicitud de actualización:', req.body);
   try {
-    const { titulo, descripcion, estado, fechaLimite } = req.body;
+    const { titulo, descripcion, estado, fechaLimite, responsable } = req.body;
 
     const tareaExistente = await Task.findById(req.params.id);
     if (!tareaExistente) {
       return res.status(404).json({ error: 'Tarea no encontrada' });
     }
 
-    // Si aún no ha sido asignada, calculamos tiempo de asignación
-    if (!tareaExistente.fechaAsignacion) {
-      const fechaAsignacion = new Date();
-      const tiempoAsignacion = (fechaAsignacion - tareaExistente.createdAt) / 1000; // en segundos
-
-      tareaExistente.fechaAsignacion = fechaAsignacion;
-      tareaExistente.tiempoAsignacion = tiempoAsignacion;
+    // Detectar si se asigna responsable por primera vez
+    const seAsignoPorPrimeraVez = !tareaExistente.responsable && responsable;
+    if (seAsignoPorPrimeraVez) {
+      const ahora = new Date();
+      tareaExistente.fechaAsignacion = ahora;
+      tareaExistente.tiempoAsignacion = Math.floor((ahora - tareaExistente.createdAt) / 1000); // segundos
     }
 
-    // Actualizamos otros campos
+    // Actualizamos los campos
     tareaExistente.titulo = titulo;
     tareaExistente.descripcion = descripcion;
     tareaExistente.estado = estado;
     tareaExistente.fechaLimite = fechaLimite;
+    tareaExistente.responsable = responsable;
 
     const tareaActualizada = await tareaExistente.save();
     res.json(tareaActualizada);
