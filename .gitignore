@@ -1,0 +1,11 @@
+# Directorio de dependencias de Node.js
+node_modules/
+
+# Archivos de caché
+.cache/
+
+# Archivos de log
+*.log
+
+# Archivos de entorno y configuración
+.env
