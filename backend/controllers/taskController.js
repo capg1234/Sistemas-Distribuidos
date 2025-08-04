@@ -41,7 +41,7 @@ exports.actualizarTarea = async (req, res) => {
       return res.status(404).json({ error: 'Tarea no encontrada' });
     }
 
-    // Verificar si aún no se ha asignado y esta es la primera vez que se asigna
+    // Si aún no ha sido asignada, calculamos tiempo de asignación
     if (!tareaExistente.fechaAsignacion) {
       const fechaAsignacion = new Date();
       const tiempoAsignacion = (fechaAsignacion - tareaExistente.createdAt) / 1000; // en segundos
@@ -50,6 +50,7 @@ exports.actualizarTarea = async (req, res) => {
       tareaExistente.tiempoAsignacion = tiempoAsignacion;
     }
 
+    // Actualizamos otros campos
     tareaExistente.titulo = titulo;
     tareaExistente.descripcion = descripcion;
     tareaExistente.estado = estado;
@@ -58,6 +59,7 @@ exports.actualizarTarea = async (req, res) => {
     const tareaActualizada = await tareaExistente.save();
     res.json(tareaActualizada);
   } catch (err) {
+    console.error(err);
     res.status(400).json({ error: 'Error al actualizar la tarea' });
   }
 };

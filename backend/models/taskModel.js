@@ -5,12 +5,11 @@ const taskSchema = new mongoose.Schema({
   descripcion: String,
   estado: String,
   fechaLimite: Date,
-  fechaAsignacion: Date,
-  tiempoAsignacion: Number // en segundos
+  fechaAsignacion: Date,         // <-- nuevo
+  tiempoAsignacion: Number       // <-- nuevo, en segundos
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
-
 /*const taskSchema = new mongoose.Schema({
   titulo: { type: String, required: true },
   descripcion: String,
