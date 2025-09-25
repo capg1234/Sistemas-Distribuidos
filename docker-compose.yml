@@ -14,7 +14,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3001:3000"
+      - "3001:80" # afuera 3001 -> adentro 80
     stdin_open: true
     tty: true
 
